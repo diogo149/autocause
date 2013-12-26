@@ -14,7 +14,7 @@ from boomlet.utils import aggregators
 from boomlet.metrics import max_error, error_variance, relative_error_variance, gini_loss, categorical_gini_loss
 from boomlet.transform.type_conversion import Discretizer
 
-from feature_functions import *
+from autocause.feature_functions import *
 
 
 """
@@ -111,7 +111,7 @@ data is the input) to pairs of converter functions and a boolean flag
 of whether or not to aggregate over the output of the converter function
 
 converter functions should have the type signature:
-converter(X_raw, X_current_type, Y_raw, Y_type)
+    converter(X_raw, X_current_type, Y_raw, Y_type)
 where X_raw is the data to convert
 """
 NUMERICAL_CONVERTERS = dict(
@@ -126,7 +126,8 @@ CATEGORICAL_CONVERTERS = dict(
 )
 
 """
-Whether or not the converters can result in a 2D output
+Whether or not the converters can result in a 2D output. This must be set to True
+if any of the respective converts can return a 2D output.
 """
 NUMERICAL_CAN_BE_2D = True
 CATEGORICAL_CAN_BE_2D = False
@@ -201,8 +202,8 @@ REGRESSION_MODEL_METRICS = [
 # points (twists: relative to y range, also try square / sqrt distance
 # as well
 CLASSIFICATION_MODEL_METRICS = [
-    # TODO
 ]
+# TODO add classification probability model metrics and copy that of regression
 
 """
 The operations to perform on the A->B features and B->A features.
@@ -216,5 +217,10 @@ RELATIVE_FEATURES = [
 
 """
 Whether or not to treat each observation (A,B) as two observations: (A,B) and (B,A)
+
+If this is done and training labels are given, those labels will have to be
+reflected as well. The reflection is performed through appending at the end.
+(e.g. if we have N training examples, observation N+1 in the output will be
+the first example reflected)
 """
 REFLECT_DATA = True

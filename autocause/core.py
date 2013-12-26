@@ -1,5 +1,6 @@
 import copy
 from collections import defaultdict
+from imp import load_source
 
 import numpy as np
 from sklearn.preprocessing import LabelBinarizer
@@ -7,7 +8,7 @@ from boomlet.utils.estimators import binarizer_from_classifier
 from boomlet.transform.preprocessing import InfinityReplacer
 from boomlet.parallel import pmap
 
-from autocause_settings import *
+CONFIG = None
 
 
 def to_2d(m):
@@ -50,7 +51,7 @@ def aggregate_apply(func, items, **kwargs):
     if len(preaggregate) > 0:
         preaggregate2d = to_2d(np.array(preaggregate))
         for feat in preaggregate2d.T:
-            for aggregator in AGGREGATORS:
+            for aggregator in CONFIG.AGGREGATORS:
                 result_append(features, aggregator(feat))
     return features
 
@@ -70,9 +71,9 @@ def aggregate_proxy(func, data, aggregate, **kwargs):
 def unary_features(X, X_type):
     assert len(X.shape) == 1
     if X_type == "N":
-        funcs = UNARY_NUMERICAL_FEATURES
+        funcs = CONFIG.UNARY_NUMERICAL_FEATURES
     elif X_type == "C":
-        funcs = UNARY_CATEGORICAL_FEATURES
+        funcs = CONFIG.UNARY_CATEGORICAL_FEATURES
     else:
         raise Exception("improper type: {}".format(X_type))
 
@@ -87,13 +88,13 @@ def binary_features(A_feat, B_feat, current_type):
     assert len(B_feat.shape) == 1
 
     if current_type == "NN":
-        funcs = BINARY_NN_FEATURES
+        funcs = CONFIG.BINARY_NN_FEATURES
     elif current_type == "NC":
-        funcs = BINARY_NC_FEATURES
+        funcs = CONFIG.BINARY_NC_FEATURES
     elif current_type == "CN":
-        funcs = BINARY_CN_FEATURES
+        funcs = CONFIG.BINARY_CN_FEATURES
     elif current_type == "CC":
-        funcs = BINARY_CC_FEATURES
+        funcs = CONFIG.BINARY_CC_FEATURES
     else:
         raise Exception("improper type: {}".format(current_type))
 
@@ -105,17 +106,17 @@ def binary_features(A_feat, B_feat, current_type):
 
 def regression_features(X, y):
     features = []
-    for clf in REGRESSION_ESTIMATORS:
+    for clf in CONFIG.REGRESSION_ESTIMATORS:
         clf = copy.deepcopy(clf)
         clf.fit(X, y)
-        for metric in REGRESSION_MODEL_METRICS:
+        for metric in CONFIG.REGRESSION_MODEL_METRICS:
             result_append(features, metric(clf, X, y))
         # TODO predicting in-sample, might be good to change someday
         pred = clf.predict(X)
-        for metric in REGRESSION_METRICS:
+        for metric in CONFIG.REGRESSION_METRICS:
             result_append(features, metric(y, pred))
         residual = y - pred
-        for metric in REGRESSION_RESIDUAL_METRICS:
+        for metric in CONFIG.REGRESSION_RESIDUAL_METRICS:
             result_append(features, metric(residual))
     return features
 
@@ -129,10 +130,10 @@ def classification_features(X, y):
         return f(*[m[:, idx] for m in matrices])
 
     features = []
-    for clf in CLASSIFICATION_ESTIMATORS:
+    for clf in CONFIG.CLASSIFICATION_ESTIMATORS:
         clf = copy.deepcopy(clf)
         clf.fit(X, y)
-        for metric in CLASSIFICATION_MODEL_METRICS:
+        for metric in CONFIG.CLASSIFICATION_MODEL_METRICS:
             result_append(features, metric(clf, X, y))
         binarizer = binarizer_from_classifier(clf)
         y_bin = binarizer.transform(y).astype(np.float)
@@ -146,7 +147,7 @@ def classification_features(X, y):
         # returns 1
         if probs.shape[1] == 2:
             probs = probs[:, 1:]
-        for metric in BINARY_PROBABILITY_CLASSIFICATION_METRICS:
+        for metric in CONFIG.BINARY_PROBABILITY_CLASSIFICATION_METRICS:
             assert probs.shape[1] == cols, (cols, probs.shape)
             features += aggregate_apply(apply_col,
                                         range(cols),
@@ -154,18 +155,18 @@ def classification_features(X, y):
                                         matrices=[y_bin, probs])
 
         residual = y_bin - probs
-        for metric in RESIDUAL_PROBABILITY_CLASSIFICATION_METRICS:
+        for metric in CONFIG.RESIDUAL_PROBABILITY_CLASSIFICATION_METRICS:
             features += aggregate_apply(apply_col,
                                         range(cols),
                                         f=metric,
                                         matrices=[residual])
 
         pred = clf.predict(X)
-        for metric in ND_CLASSIFICATION_METRICS:
+        for metric in CONFIG.ND_CLASSIFICATION_METRICS:
             result_append(features, metric(y, pred))
 
         pred_bin = binarizer.transform(pred).astype(np.float)
-        for metric in BINARY_CLASSIFICATION_METRICS:
+        for metric in CONFIG.BINARY_CLASSIFICATION_METRICS:
             assert pred_bin.shape[1] == cols
             features += aggregate_apply(apply_col,
                                         range(cols),
@@ -204,15 +205,15 @@ def convert(X_raw, X_current_type, Y_raw, Y_type):
     """
     assert X_current_type in "NBC"
     # conversion to numerical
-    if CONVERT_TO_NUMERICAL:
-        converter = NUMERICAL_CONVERTERS[X_current_type]
+    if CONFIG.CONVERT_TO_NUMERICAL:
+        converter = CONFIG.NUMERICAL_CONVERTERS[X_current_type]
         yield (converter(X_raw, X_current_type, Y_raw, Y_type).astype(np.float),
-               NUMERICAL_CAN_BE_2D,
+               CONFIG.NUMERICAL_CAN_BE_2D,
                "N")
-    if CONVERT_TO_CATEGORICAL:
-        converter = CATEGORICAL_CONVERTERS[X_current_type]
+    if CONFIG.CONVERT_TO_CATEGORICAL:
+        converter = CONFIG.CATEGORICAL_CONVERTERS[X_current_type]
         yield (converter(X_raw, X_current_type, Y_raw, Y_type).astype(np.float),
-               CATEGORICAL_CAN_BE_2D,
+               CONFIG.CATEGORICAL_CAN_BE_2D,
                "C")
 
 
@@ -269,21 +270,31 @@ def reflect_data(A_to_B, B_to_A):
     returns features equivalent to if the input to the algorithm contained
     B, A for each A, B in the input
     """
-    if not REFLECT_DATA:
+    if not CONFIG.REFLECT_DATA:
         return A_to_B, B_to_A
     return np.vstack((A_to_B, B_to_A)), np.vstack((B_to_A, A_to_B))
 
 
 def relative_features(A_to_B, B_to_A):
     return np.hstack([relative_feat(A_to_B, B_to_A)
-                      for relative_feat in RELATIVE_FEATURES])
+                      for relative_feat in CONFIG.RELATIVE_FEATURES])
 
 
-def featurize(pairs):
+def load_settings(filepath):
+    """
+    setting a global configuration object so that the settings don't have
+    to be passed around all over the place
+    """
+    global CONFIG
+    CONFIG = load_source("autocause_settings", filepath)
+
+
+def featurize(pairs, config_path="autocause/autocause_settings.py"):
     """
     takes in input of the form (A, A_type, B, B_type) with A_type and
     B_type in {"N", "C", "B"} for numerical, cateogrical, binary respectively
     """
+    load_settings(config_path)
     featurized = pmap(featurize_pair, pairs)
     A_to_B = np.array([i[0] for i in featurized])
     B_to_A = np.array([i[1] for i in featurized])
