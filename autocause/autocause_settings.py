@@ -72,15 +72,21 @@ converter(X_raw, X_current_type, Y_raw, Y_type)
 where X_raw is the data to convert
 """
 NUMERICAL_CONVERTERS = dict(
-    N=(lambda x, *args: x, False),  # identity function
-    B=(lambda x, *args: x, False),  # identity function
-    C=(lambda x, *args: LabelBinarizer().fit_transform(x), True),
+    N=lambda x, *args: x,  # identity function
+    B=lambda x, *args: x,  # identity function
+    C=lambda x, *args: LabelBinarizer().fit_transform(x),
 )
 CATEGORICAL_CONVERTERS = dict(
-    N=(lambda x, *args: Discretizer().fit_transform(x), False),
-    B=(lambda x, *args: x, False),  # identity function
-    C=(lambda x, *args: x, False),  # identity function
+    N=lambda x, *args: Discretizer().fit_transform(x).flatten(),
+    B=lambda x, *args: x,  # identity function
+    C=lambda x, *args: x,  # identity function
 )
+
+"""
+Whether or not the converters can result in a 2D output
+"""
+NUMERICAL_CAN_BE_2D = True
+CATEGORICAL_CAN_BE_2D = False
 
 """
 Estimators used to provide a fit for a variable

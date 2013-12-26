@@ -43,12 +43,14 @@ def aggregate_apply(func, items, **kwargs):
     then aggregating the results into a 1-D list
     """
     preaggregate = []
-    features = []
     for item in items:
-        result_append(preaggregate, func(item, **kwargs))
-    print preaggregate
-    for aggregator in AGGREGATORS:
-        result_append(features, aggregator(preaggregate))
+        preaggregate.append(func(item, **kwargs))
+    features = []
+    if len(preaggregate) > 0:
+        preaggregate2d = to_2d(np.array(preaggregate))
+        for feat in preaggregate2d.T:
+            for aggregator in AGGREGATORS:
+                result_append(features, aggregator(feat))
     return features
 
 
@@ -57,9 +59,8 @@ def aggregate_proxy(func, data, aggregate, **kwargs):
     performs the logic on whether or not to aggregate based on a boolean flag (aggregate)
     """
     if aggregate:
-        assert len(data.shape) == 2
         # have each element be a column
-        return aggregate_apply(func, data.T, **kwargs)
+        return aggregate_apply(func, to_2d(data).T, **kwargs)
     else:
         assert len(data.shape) == 1
         return func(data, **kwargs)
@@ -179,7 +180,7 @@ def estimator_features(A_feat, B_feat, current_type):
 
     if A_type == "N":
         # convert numerical to 2-D matrix
-        X = A_feat.reshape(-1, 1)
+        X = to_2d(A_feat)
     elif A_type == "C":
         # convert categorical to binary matrix
         X = LabelBinarizer().fit_transform(A_feat)
@@ -203,11 +204,15 @@ def convert(X_raw, X_current_type, Y_raw, Y_type):
     assert X_current_type in "NBC"
     # conversion to numerical
     if CONVERT_TO_NUMERICAL:
-        converter, aggregate = NUMERICAL_CONVERTERS[X_current_type]
-        yield converter(X_raw, X_current_type, Y_raw, Y_type), aggregate, "N"
+        converter = NUMERICAL_CONVERTERS[X_current_type]
+        yield (converter(X_raw, X_current_type, Y_raw, Y_type),
+               NUMERICAL_CAN_BE_2D,
+               "N")
     if CONVERT_TO_CATEGORICAL:
-        converter, aggregate = CATEGORICAL_CONVERTERS[X_current_type]
-        yield converter(X_raw, X_current_type, Y_raw, Y_type), aggregate, "C"
+        converter = CATEGORICAL_CONVERTERS[X_current_type]
+        yield (converter(X_raw, X_current_type, Y_raw, Y_type),
+               CATEGORICAL_CAN_BE_2D,
+               "C")
 
 
 def featurize_one_way(A, A_type, B, B_type):
@@ -243,6 +248,7 @@ def featurize_one_way(A, A_type, B, B_type):
                                         B_data,
                                         B_aggregate,
                                         current_type=current_type)
+
     return np.array(features)
 
 
@@ -266,6 +272,7 @@ def reflect_data(A_to_B, B_to_A):
         return A_to_B, B_to_A
     return np.vstack((A_to_B, B_to_A)), np.vstack((B_to_A, A_to_B))
 
+
 def relative_features(A_to_B, B_to_A):
     return np.hstack([relative_feat(A_to_B, B_to_A)
                       for relative_feat in RELATIVE_FEATURES])
@@ -279,6 +286,8 @@ def featurize(pairs):
     featurized = map(featurize_pair, pairs)
     A_to_B = np.array([i[0] for i in featurized])
     B_to_A = np.array([i[1] for i in featurized])
+    # import pdb
+    # pdb.set_trace()
     # TODO add metafeatures
     # TODO optionally perform metafeature cross-product
     A_to_B, B_to_A = reflect_data(A_to_B, B_to_A)
