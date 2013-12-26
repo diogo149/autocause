@@ -5,6 +5,7 @@ import numpy as np
 from sklearn.preprocessing import LabelBinarizer
 from boomlet.utils.estimators import binarizer_from_classifier
 from boomlet.transform.preprocessing import InfinityReplacer
+from boomlet.parallel import pmap
 
 from autocause_settings import *
 
@@ -134,7 +135,7 @@ def classification_features(X, y):
         for metric in CLASSIFICATION_MODEL_METRICS:
             result_append(features, metric(clf, X, y))
         binarizer = binarizer_from_classifier(clf)
-        y_bin = binarizer.transform(y)
+        y_bin = binarizer.transform(y).astype(np.float)
         cols = y_bin.shape[1]
 
         # TODO predicting in-sample, might be good to change someday
@@ -163,7 +164,7 @@ def classification_features(X, y):
         for metric in ND_CLASSIFICATION_METRICS:
             result_append(features, metric(y, pred))
 
-        pred_bin = binarizer.transform(pred)
+        pred_bin = binarizer.transform(pred).astype(np.float)
         for metric in BINARY_CLASSIFICATION_METRICS:
             assert pred_bin.shape[1] == cols
             features += aggregate_apply(apply_col,
@@ -205,12 +206,12 @@ def convert(X_raw, X_current_type, Y_raw, Y_type):
     # conversion to numerical
     if CONVERT_TO_NUMERICAL:
         converter = NUMERICAL_CONVERTERS[X_current_type]
-        yield (converter(X_raw, X_current_type, Y_raw, Y_type),
+        yield (converter(X_raw, X_current_type, Y_raw, Y_type).astype(np.float),
                NUMERICAL_CAN_BE_2D,
                "N")
     if CONVERT_TO_CATEGORICAL:
         converter = CATEGORICAL_CONVERTERS[X_current_type]
-        yield (converter(X_raw, X_current_type, Y_raw, Y_type),
+        yield (converter(X_raw, X_current_type, Y_raw, Y_type).astype(np.float),
                CATEGORICAL_CAN_BE_2D,
                "C")
 
@@ -283,7 +284,7 @@ def featurize(pairs):
     takes in input of the form (A, A_type, B, B_type) with A_type and
     B_type in {"N", "C", "B"} for numerical, cateogrical, binary respectively
     """
-    featurized = map(featurize_pair, pairs)
+    featurized = pmap(featurize_pair, pairs)
     A_to_B = np.array([i[0] for i in featurized])
     B_to_A = np.array([i[1] for i in featurized])
     # import pdb

@@ -1,5 +1,6 @@
 import numpy as np
-from scipy.stats import skew, kurtosis, shapiro
+from scipy.stats import skew, kurtosis, shapiro, pearsonr, ansari, mood, levene, fligner, bartlett, mannwhitneyu
+from scipy.spatial.distance import braycurtis, canberra, chebyshev, cityblock, correlation, cosine, euclidean, hamming, jaccard, kulsinski, matching, rogerstanimoto, russellrao, sokalmichener, sqeuclidean
 from sklearn.preprocessing import LabelBinarizer
 from sklearn.linear_model import Ridge, LinearRegression, LogisticRegression
 from sklearn.tree import DecisionTreeRegressor, DecisionTreeClassifier
@@ -7,6 +8,7 @@ from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, R
 from sklearn.neighbors import KNeighborsRegressor, KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.metrics import explained_variance_score, mean_absolute_error, mean_squared_error, r2_score, accuracy_score, roc_auc_score, average_precision_score, f1_score, hinge_loss, matthews_corrcoef, precision_score, recall_score, zero_one_loss
+from sklearn.metrics.cluster import adjusted_mutual_info_score, adjusted_rand_score, completeness_score, homogeneity_completeness_v_measure, homogeneity_score, mutual_info_score, normalized_mutual_info_score, v_measure_score
 
 from boomlet.utils import aggregators
 from boomlet.metrics import max_error, error_variance, relative_error_variance, gini_loss, categorical_gini_loss
@@ -54,12 +56,53 @@ UNARY_CATEGORICAL_FEATURES = [
 Functions that compute a metric on two 1-D arrays
 """
 BINARY_NN_FEATURES = [
+    chi_square,
+    pearsonr,
+    correlation_magnitude,
+    braycurtis,
+    canberra,
+    chebyshev,
+    cityblock,
+    correlation,
+    cosine,
+    euclidean,
+    hamming,
+    sqeuclidean,
+    ansari,
+    mood,
+    levene,
+    fligner,
+    bartlett,
+    mannwhitneyu,
+    independent_component,
 ]
 BINARY_NC_FEATURES = [
 ]
 BINARY_CN_FEATURES = [
+    categorical_numerical_homogeneity,
+    bucket_variance,
+    anova,
 ]
 BINARY_CC_FEATURES = [
+    categorical_categorical_homogeneity,
+    anova,
+    dice_,
+    jaccard,
+    kulsinski,
+    matching,
+    rogerstanimoto,
+    russellrao,
+    sokalmichener,
+    sokalsneath_,
+    yule_,
+    adjusted_mutual_info_score,
+    adjusted_rand_score,
+    completeness_score,
+    homogeneity_completeness_v_measure,
+    homogeneity_score,
+    mutual_info_score,
+    normalized_mutual_info_score,
+    v_measure_score,
 ]
 
 """
