@@ -8,7 +8,7 @@ from boomlet.utils.estimators import binarizer_from_classifier
 from boomlet.transform.preprocessing import InfinityReplacer
 from boomlet.parallel import pmap
 
-CONFIG = None
+CONFIG = __import__("autocause.autocause_settings").autocause_settings
 
 
 def to_2d(m):
@@ -289,12 +289,13 @@ def load_settings(filepath):
     CONFIG = load_source("autocause_settings", filepath)
 
 
-def featurize(pairs, config_path="autocause/autocause_settings.py"):
+def featurize(pairs, config_path=None):
     """
     takes in input of the form (A, A_type, B, B_type) with A_type and
     B_type in {"N", "C", "B"} for numerical, cateogrical, binary respectively
     """
-    load_settings(config_path)
+    if config_path is not None:
+        load_settings(config_path)
     featurized = pmap(featurize_pair, pairs)
     A_to_B = np.array([i[0] for i in featurized])
     B_to_A = np.array([i[1] for i in featurized])
