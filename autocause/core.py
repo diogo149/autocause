@@ -4,20 +4,12 @@ from imp import load_source
 
 import numpy as np
 from sklearn.preprocessing import LabelBinarizer
+from boomlet.utils.array import to_2d
 from boomlet.utils.estimators import binarizer_from_classifier
 from boomlet.transform.preprocessing import InfinityReplacer
 from boomlet.parallel import pmap
 
 CONFIG = __import__("autocause.autocause_settings").autocause_settings
-
-
-def to_2d(m):
-    if len(m.shape) == 2:
-        return m
-    elif len(m.shape) == 1:
-        return m.reshape(-1, 1)
-    else:
-        raise Exception("Improper shape: {}".fotmat(m.shape))
 
 
 def result_append(array, result):
