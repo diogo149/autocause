@@ -1,0 +1,10 @@
+SampleID,Target [1 for A->B; -1 otherwise],Details [1 for A->B; 2 for A<-B; 3 for A-B; 4 for A|B]
+train1,-1,2
+train2,-1,2
+train3,0,4
+train4,-1,2
+train5,-1,2
+train6,1,1
+train7,0,4
+train8,1,1
+train9,-1,2

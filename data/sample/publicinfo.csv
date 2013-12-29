@@ -1,0 +1,10 @@
+SampleID,A type,B type
+train1,Binary,Numerical
+train2,Numerical,Numerical
+train3,Numerical,Numerical
+train4,Numerical,Categorical
+train5,Numerical,Binary
+train6,Numerical,Numerical
+train7,Numerical,Numerical
+train8,Numerical,Categorical
+train9,Numerical,Numerical

@@ -1,4 +1,5 @@
 *~
 *.pyc
 
-data/
+data/SUP1data_text/CEdata_train_pairs.csv
+data/SUP2data_text/CEdata_train_pairs.csv

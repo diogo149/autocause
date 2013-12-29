@@ -27,3 +27,10 @@ Status
 + Missing metafeatures (A is, AB are, {AB, BA} are among)
 + Missing some more features (especially model complexity features)
 + Missing the "state of the art" features
+
+Challenge Data
+-----------
++ data for SUP1 and SUP2 have been split (too large for github) with the following command:
+    split --bytes=90m CEdata_train_pairs.csv CEdata_train_pairs.csv
++ recombine the split files into the original with the command:
+    cat CEdata_train_pairs.csv* > CEdata_train_pairs.csv
