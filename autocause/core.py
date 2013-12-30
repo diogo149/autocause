@@ -114,9 +114,20 @@ def regression_features(X, y):
 
 
 def classification_features(X, y):
-    # TODO check if this actually happens in practice
     # special casing when there is only one value of y
-    # has_one_class = len(np.unique(y)) == 1
+    # this is handled this way because we wouldn't be
+    # able to provide stubbed values for a trained classifier
+    # for the model metric features, and we cannot just
+    # fill in 0's because we don't know a priori how many
+    # arguments each of the feature functions will return.
+    # it may be possible to instead look at the number returned
+    # by previous invocations of the functions, but that would
+    # a) require code restructuring, b) non-local information and
+    # c) might not work all the time
+    if len(np.unique(y)) == 1:
+        assert len(y.shape) == 1
+        # set a new value in y
+        y[0] += 1
 
     def apply_col(idx, f, matrices):
         return f(*[m[:, idx] for m in matrices])
