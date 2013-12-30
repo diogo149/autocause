@@ -47,6 +47,7 @@ UNARY_NUMERICAL_FEATURES = [
     kurtosis,
     np.std,
     shapiro,
+    independent_component,
 ]
 UNARY_CATEGORICAL_FEATURES = [
     lambda x: len(set(x)),  # number of unique
@@ -74,7 +75,6 @@ BINARY_NN_FEATURES = [
     fligner,
     bartlett,
     mannwhitneyu,
-    independent_component,
 ]
 BINARY_NC_FEATURES = [
 ]

@@ -24,6 +24,16 @@ def normalized_entropy(x):
     return hx
 
 
+def independent_component(x):
+    clf = FastICA(random_state=1)
+    transformed = clf.fit(x.reshape(-1, 1))
+    comp = clf.components_[0, 0]
+    mm = clf.mixing_[0, 0]
+    src_max = transformed.max()
+    src_min = transformed.min()
+    return [comp, mm, src_max, src_min]
+
+
 def correlation_magnitude(x, y):
     return abs(pearsonr(x, y)[0])
 
@@ -72,17 +82,6 @@ def bucket_variance(x, y):
         weighted_avg_var += len(bucket) * var
     weighted_avg_var /= len(x)
     return (max_var, weighted_avg_var)
-
-
-def independent_component(x, y):
-    clf = FastICA(random_state=1)
-    clf.fit(x.reshape(-1, 1), y)
-    comp = clf.components_[0][0]
-    mm = clf.get_mixing_matrix()[0][0]
-    sources = clf.sources_.flatten()
-    src_max = max(sources)
-    src_min = min(sources)
-    return [comp, mm, src_max, src_min]
 
 
 def dice_(x, y):
