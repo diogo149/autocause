@@ -26,7 +26,7 @@ def normalized_entropy(x):
 
 def independent_component(x):
     clf = FastICA(random_state=1)
-    transformed = clf.fit(x.reshape(-1, 1))
+    transformed = clf.fit_transform(x.reshape(-1, 1))
     comp = clf.components_[0, 0]
     mm = clf.mixing_[0, 0]
     src_max = transformed.max()
