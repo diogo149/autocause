@@ -47,7 +47,6 @@ UNARY_NUMERICAL_FEATURES = [
     kurtosis,
     np.std,
     shapiro,
-    independent_component,
 ]
 UNARY_CATEGORICAL_FEATURES = [
     lambda x: len(set(x)),  # number of unique
@@ -57,6 +56,7 @@ UNARY_CATEGORICAL_FEATURES = [
 Functions that compute a metric on two 1-D arrays
 """
 BINARY_NN_FEATURES = [
+    independent_component,
     chi_square,
     pearsonr,
     correlation_magnitude,

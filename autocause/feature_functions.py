@@ -24,7 +24,7 @@ def normalized_entropy(x):
     return hx
 
 
-def independent_component(x):
+def independent_component(x, y):
     clf = FastICA(random_state=1)
     transformed = clf.fit_transform(x.reshape(-1, 1))
     comp = clf.components_[0, 0]
