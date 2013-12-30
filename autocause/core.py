@@ -4,7 +4,7 @@ from imp import load_source
 
 import numpy as np
 from sklearn.preprocessing import LabelBinarizer
-from boomlet.utils.array import to_2d
+from boomlet.utils.array import to_2d, column_combinations
 from boomlet.utils.estimators import binarizer_from_classifier
 from boomlet.transform.preprocessing import InfinityReplacer
 from boomlet.parallel import pmap
@@ -272,6 +272,67 @@ def relative_features(A_to_B, B_to_A):
                       for relative_feat in CONFIG.RELATIVE_FEATURES])
 
 
+def metafeatures(pairs):
+    """
+    generates binary features for data on the types of the pair
+
+    e.g. 1/0 feature on whether or not A is Numerical
+    """
+    types = [(A_type, B_type) for (_, A_type, _, B_type) in pairs]
+    if CONFIG.REFLECT_DATA:
+        types += map(lambda x: list(reversed(x)), types)
+
+    features = []
+    for A_type, B_type in types:
+        # generate features for a single row / observation
+        one_feature = []
+
+        def a(elem):
+            one_feature.append(elem)
+
+        a(A_type == "N")
+        a(A_type == "B")
+        a(A_type == "C")
+        a(B_type == "N")
+        a(B_type == "B")
+        a(B_type == "C")
+
+        unordered_combination_type = A_type + B_type
+        a(unordered_combination_type == "NN")
+        a(unordered_combination_type == "NB")
+        a(unordered_combination_type == "NC")
+        a(unordered_combination_type == "BN")
+        a(unordered_combination_type == "BB")
+        a(unordered_combination_type == "BC")
+        a(unordered_combination_type == "CN")
+        a(unordered_combination_type == "CB")
+        a(unordered_combination_type == "CC")
+
+        ordered_combination_type = "".join(sorted(unordered_combination_type))
+        a(ordered_combination_type == "NN")
+        a(ordered_combination_type == "BN")
+        a(ordered_combination_type == "BB")
+        a(ordered_combination_type == "BC")
+        a(ordered_combination_type == "CN")
+        a(ordered_combination_type == "CC")
+
+        features.append(one_feature)
+
+    return np.array(features, dtype=np.float)
+
+
+def add_metafeatures(pairs, data):
+    if not CONFIG.ADD_METAFEATURES:
+        return data
+
+    mf = metafeatures(pairs)
+
+    if CONFIG.COMPUTE_METAFEATURE_COMBINATIONS:
+        return to_2d(data, mf, column_combinations(data, mf))
+    else:
+        return to_2d(data, mf)
+
+
 def load_settings(filepath):
     """
     setting a global configuration object so that the settings don't have
@@ -291,10 +352,7 @@ def featurize(pairs, config_path=None):
     featurized = pmap(featurize_pair, pairs)
     A_to_B = np.array([i[0] for i in featurized])
     B_to_A = np.array([i[1] for i in featurized])
-    # import pdb
-    # pdb.set_trace()
-    # TODO add metafeatures
-    # TODO optionally perform metafeature cross-product
     A_to_B, B_to_A = reflect_data(A_to_B, B_to_A)
     relative = relative_features(A_to_B, B_to_A)
-    return postprocess(relative)
+    with_mf = add_metafeatures(pairs, relative)
+    return postprocess(with_mf)

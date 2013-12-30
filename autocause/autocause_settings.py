@@ -195,15 +195,9 @@ of type signature:
 REGRESSION_MODEL_METRICS = [
     # TODO model complexity metrics
 ]
-# TODO idea:
-# dim reduction down to 1 dimension on X
-# for different values in the available range (many ways to do this)
-# convert back to N-d space and calculate distance between consecutive
-# points (twists: relative to y range, also try square / sqrt distance
-# as well
 CLASSIFICATION_MODEL_METRICS = [
+    # TODO use regression model metrics on predict_proba
 ]
-# TODO add classification probability model metrics and copy that of regression
 
 """
 The operations to perform on the A->B features and B->A features.
@@ -224,3 +218,21 @@ reflected as well. The reflection is performed through appending at the end.
 the first example reflected)
 """
 REFLECT_DATA = True
+
+"""
+Whether or not metafeatures based on the types of A and B are generated.
+
+e.g. 1/0 feature on whether or not A is Numerical, etc.
+"""
+ADD_METAFEATURES = True
+
+"""
+Whether or not to generate combination features between the computed
+features and metafeatures.
+
+e.g. for each feature and metafeature, generate a new feature which is the
+product of the two
+
+WARNING: will generate a LOT of features (approximately 21 times as many)
+"""
+COMPUTE_METAFEATURE_COMBINATIONS = False

@@ -7,6 +7,7 @@ Goals
 ----
 + Understandable code
 + Customizability
++ Reproducibility
 
 Not Goals
 -----
@@ -14,6 +15,7 @@ Not Goals
 
 Requirements
 --------
++ Python 2.7
 + numpy
 + scipy
 + pandas
@@ -22,11 +24,8 @@ Requirements
 
 Status
 -----
-+ Feature creation works fine
 + No features have been tested for performance (so they may be wrong)
-+ Missing metafeatures (A is, AB are, {AB, BA} are among)
-+ Missing some more features (especially model complexity features)
-+ Missing the "state of the art" features
++ More features could be added
 
 Challenge Data
 -----------
