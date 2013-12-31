@@ -363,7 +363,10 @@ def featurize(pairs, config_path=None):
     featurized = pmap(featurize_pair, pairs)
     A_to_B = np.array([i[0] for i in featurized])
     B_to_A = np.array([i[1] for i in featurized])
+    del featurized
     A_to_B, B_to_A = reflect_data(A_to_B, B_to_A)
     relative = relative_features(A_to_B, B_to_A)
+    del A_to_B, B_to_A
     with_mf = add_metafeatures(pairs, relative)
+    del pairs, relative
     return postprocess(with_mf)
