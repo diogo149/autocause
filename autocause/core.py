@@ -6,7 +6,7 @@ import numpy as np
 from sklearn.preprocessing import LabelBinarizer
 from boomlet.utils.array import to_2d, column_combinations
 from boomlet.utils.estimators import binarizer_from_classifier
-from boomlet.transform.preprocessing import InfinityReplacer
+from boomlet.transform.preprocessing import InfinityReplacer, InvalidRemover
 from boomlet.parallel import pmap
 
 CONFIG = __import__("autocause.autocause_settings").autocause_settings
@@ -265,7 +265,9 @@ def featurize_pair(pair):
 
 
 def postprocess(array):
-    return InfinityReplacer().transform(array)
+    no_inf = InfinityReplacer().transform(array)
+    no_nan = InvalidRemover().transform(no_inf)
+    return no_nan
 
 
 def reflect_data(A_to_B, B_to_A):
