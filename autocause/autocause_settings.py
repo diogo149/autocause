@@ -217,7 +217,7 @@ reflected as well. The reflection is performed through appending at the end.
 (e.g. if we have N training examples, observation N+1 in the output will be
 the first example reflected)
 """
-REFLECT_DATA = True
+REFLECT_DATA = False
 
 """
 Whether or not metafeatures based on the types of A and B are generated.

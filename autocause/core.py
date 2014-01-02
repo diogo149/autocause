@@ -372,3 +372,31 @@ def featurize(pairs, config_path=None):
     with_mf = add_metafeatures(pairs, relative)
     del pairs, relative
     return postprocess(with_mf)
+
+
+import os
+from boomlet.storage import joblib_dump, joblib_load
+from boomlet.experimental import folder_apply
+
+
+PAIRS_PICKLE = "pairs.pkl"
+
+
+def _featurize_many_helper(config_path):
+    """
+    Separate helper function so that this can be pickled.
+    """
+    pairs = joblib_load(PAIRS_PICKLE)
+    return featurize(pairs,config_path)
+
+
+def featurize_many(pairs, config_folder):
+    assert not os.path.exists(PAIRS_PICKLE)
+    joblib_dump(PAIRS_PICKLE, pairs, compress=9)
+    try:
+        folder_apply(_featurize_many_helper,
+                     config_folder,
+                     ext=".py",
+                     parallel=False)
+    finally:
+        os.remove(PAIRS_PICKLE)
