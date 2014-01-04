@@ -10,7 +10,7 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.metrics import explained_variance_score, mean_absolute_error, mean_squared_error, r2_score, accuracy_score, roc_auc_score, average_precision_score, f1_score, hinge_loss, matthews_corrcoef, precision_score, recall_score, zero_one_loss
 from sklearn.metrics.cluster import adjusted_mutual_info_score, adjusted_rand_score, completeness_score, homogeneity_completeness_v_measure, homogeneity_score, mutual_info_score, normalized_mutual_info_score, v_measure_score
 
-from boomlet.utils import aggregators
+from boomlet.utils.aggregators import to_aggregator
 from boomlet.metrics import max_error, error_variance, relative_error_variance, gini_loss, categorical_gini_loss
 from boomlet.transform.type_conversion import Discretizer
 
@@ -30,7 +30,14 @@ Sample use:
 WARNING: these will be used in various locations throughout the code base
 and will result in feature size growing at faster than a linear rate
 """
-AGGREGATORS = aggregators.AGGREGATORS.values()
+AGGREGATORS = [
+    to_aggregator("max"),
+    to_aggregator("min"),
+    to_aggregator("median"),
+    to_aggregator("mode"),
+    to_aggregator("mean"),
+    to_aggregator("sum"),
+]
 
 """
 Boolean flags specifying whether or not to perform conversions
