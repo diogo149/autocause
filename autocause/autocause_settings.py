@@ -15,6 +15,7 @@ from boomlet.metrics import max_error, error_variance, relative_error_variance, 
 from boomlet.transform.type_conversion import Discretizer
 
 from autocause.feature_functions import *
+from autocause.converters import NUMERICAL_TO_NUMERICAL, NUMERICAL_TO_CATEGORICAL, BINARY_TO_NUMERICAL, BINARY_TO_CATEGORICAL, CATEGORICAL_TO_NUMERICAL, CATEGORICAL_TO_CATEGORICAL
 
 
 """
@@ -97,7 +98,7 @@ BINARY_CC_FEATURES = [
     jaccard,
     kulsinski,
     matching,
-    rogerstanimoto,
+    rogerstanimoto,  # TODO catch a ZeroDivisionError on this func
     russellrao,
     sokalmichener,
     sokalsneath_,
@@ -122,14 +123,14 @@ converter functions should have the type signature:
 where X_raw is the data to convert
 """
 NUMERICAL_CONVERTERS = dict(
-    N=lambda x, *args: x,  # identity function
-    B=lambda x, *args: x,  # identity function
-    C=lambda x, *args: LabelBinarizer().fit_transform(x),
+    N=NUMERICAL_TO_NUMERICAL["identity"],
+    B=BINARY_TO_NUMERICAL["identity"],
+    C=CATEGORICAL_TO_NUMERICAL["binarize"],
 )
 CATEGORICAL_CONVERTERS = dict(
-    N=lambda x, *args: Discretizer().fit_transform(x).flatten(),
-    B=lambda x, *args: x,  # identity function
-    C=lambda x, *args: x,  # identity function
+    N=NUMERICAL_TO_CATEGORICAL["discretizer10"],
+    B=BINARY_TO_CATEGORICAL["identity"],
+    C=CATEGORICAL_TO_CATEGORICAL["identity"],
 )
 
 """

@@ -210,14 +210,18 @@ def convert(X_raw, X_current_type, Y_raw, Y_type):
     # conversion to numerical
     if CONFIG.CONVERT_TO_NUMERICAL:
         converter = CONFIG.NUMERICAL_CONVERTERS[X_current_type]
-        yield (converter(X_raw, X_current_type, Y_raw, Y_type).astype(np.float),
-               CONFIG.NUMERICAL_CAN_BE_2D,
-               "N")
+        converted = converter(X_raw, X_current_type, Y_raw, Y_type).astype(np.float)
+        if not CONFIG.NUMERICAL_CAN_BE_2D:
+            converted = converted.flatten()
+        assert converted.shape[0] == Y_raw.shape[0], (converted.shape, Y_raw.shape)
+        yield (converted, CONFIG.NUMERICAL_CAN_BE_2D, "N")
     if CONFIG.CONVERT_TO_CATEGORICAL:
         converter = CONFIG.CATEGORICAL_CONVERTERS[X_current_type]
-        yield (converter(X_raw, X_current_type, Y_raw, Y_type).astype(np.float),
-               CONFIG.CATEGORICAL_CAN_BE_2D,
-               "C")
+        converted = converter(X_raw, X_current_type, Y_raw, Y_type).astype(np.float)
+        if not CONFIG.CATEGORICAL_CAN_BE_2D:
+            converted = converted.flatten()
+        assert converted.shape[0] == Y_raw.shape[0], (converted.shape, Y_raw.shape)
+        yield (converted, CONFIG.CATEGORICAL_CAN_BE_2D, "C")
 
 
 def featurize_one_way(A, A_type, B, B_type):
