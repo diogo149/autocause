@@ -2,6 +2,7 @@ from sklearn.cluster import MiniBatchKMeans, Ward, MeanShift, SpectralClustering
 from sklearn.decomposition import RandomizedPCA, FastICA
 
 from boomlet.contextmanagers import seed_random
+from boomlet.transform import FitClusterer
 from boomlet.transform.type_conversion import Discretizer, BinaryTransformer, Clusterizer, DiscreteConstantPredictor, DiscreteOrdinalPredictor
 
 
@@ -59,6 +60,7 @@ NUMERICAL_TO_CATEGORICAL = dict(
     discretizer10=discretizer(10),
     kmeans3=clusterizer(MiniBatchKMeans(3)),
     kmeans10=clusterizer(MiniBatchKMeans(10)),
+    kmeans_gap=clusterizer(FitClusterer(min_clusters=3)),
     ward3=clusterizer(Ward(3)),
     ward10=clusterizer(Ward(10)),
     meanshift=clusterizer(MeanShift()),
