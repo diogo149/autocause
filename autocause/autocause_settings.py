@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.stats import skew, kurtosis, shapiro, pearsonr, ansari, mood, levene, fligner, bartlett, mannwhitneyu
-from scipy.spatial.distance import braycurtis, canberra, chebyshev, cityblock, correlation, cosine, euclidean, hamming, jaccard, kulsinski, matching, russellrao, sokalmichener, sqeuclidean
+from scipy.spatial.distance import braycurtis, canberra, chebyshev, cityblock, correlation, cosine, euclidean, hamming, jaccard, kulsinski, matching, russellrao, sqeuclidean
 from sklearn.preprocessing import LabelBinarizer
 from sklearn.linear_model import Ridge, LinearRegression, LogisticRegression
 from sklearn.tree import DecisionTreeRegressor, DecisionTreeClassifier
@@ -100,7 +100,7 @@ BINARY_CC_FEATURES = [
     matching,
     rogerstanimoto_,
     russellrao,
-    sokalmichener,
+    sokalmichener_,
     sokalsneath_,
     yule_,
     adjusted_mutual_info_score,
