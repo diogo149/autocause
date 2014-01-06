@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.stats import skew, kurtosis, shapiro, pearsonr, ansari, mood, levene, fligner, bartlett, mannwhitneyu
-from scipy.spatial.distance import braycurtis, canberra, chebyshev, cityblock, correlation, cosine, euclidean, hamming, jaccard, kulsinski, matching, rogerstanimoto, russellrao, sokalmichener, sqeuclidean
+from scipy.spatial.distance import braycurtis, canberra, chebyshev, cityblock, correlation, cosine, euclidean, hamming, jaccard, kulsinski, matching, russellrao, sokalmichener, sqeuclidean
 from sklearn.preprocessing import LabelBinarizer
 from sklearn.linear_model import Ridge, LinearRegression, LogisticRegression
 from sklearn.tree import DecisionTreeRegressor, DecisionTreeClassifier
@@ -98,7 +98,7 @@ BINARY_CC_FEATURES = [
     jaccard,
     kulsinski,
     matching,
-    rogerstanimoto,  # TODO catch a ZeroDivisionError on this func
+    rogerstanimoto_,
     russellrao,
     sokalmichener,
     sokalsneath_,

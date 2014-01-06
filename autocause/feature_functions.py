@@ -3,7 +3,7 @@ from collections import defaultdict
 import numpy as np
 from scipy.special import psi
 from scipy.stats import pearsonr, chisquare, f_oneway, kruskal
-from scipy.spatial.distance import dice, sokalsneath, yule
+from scipy.spatial.distance import dice, sokalsneath, yule, rogerstanimoto
 from sklearn.decomposition import FastICA
 
 from boomlet.metrics import categorical_gini_coefficient, gini_coefficient
@@ -101,5 +101,12 @@ def sokalsneath_(x, y):
 def yule_(x, y):
     try:
         return yule(x, y)
+    except ZeroDivisionError:
+        return 0
+
+
+def rogerstanimoto_(x, y):
+    try:
+        return rogerstanimoto(x, y)
     except ZeroDivisionError:
         return 0
