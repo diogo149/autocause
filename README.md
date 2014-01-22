@@ -9,10 +9,6 @@ Goals
 + Customizability
 + Reproducibility
 
-Not Goals
------
-+ Computational efficiency: while it is nice, the focus will be on easy of use
-
 Requirements
 --------
 + Python 2.7
@@ -20,12 +16,15 @@ Requirements
 + scipy
 + pandas
 + scikit-learn
-+ boomlet
++ boomlet (http://github.com/diogo149/boomlet)
 
 Status
 -----
-+ No features have been tested for performance (so they may be wrong)
-+ More features could be added
+More features could be added, but based on testing, features perform better than expected.
+
+Usage
+-----
+Copy the settings template, make changes to it, and pass the pairs of variables and the new settings file to the autocause.core.featurize function.
 
 Challenge Data
 -----------
@@ -33,3 +32,7 @@ Challenge Data
     split --bytes=90m CEdata_train_pairs.csv CEdata_train_pairs.csv
 + recombine the split files into the original with the command:
     cat CEdata_train_pairs.csv* > CEdata_train_pairs.csv
+
+Interest
+-------
+If you're interested in using this or new features, send me an email at diogo149@gmail.com and we can talk about it.
