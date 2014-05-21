@@ -17,6 +17,7 @@ Requirements
 + pandas
 + scikit-learn
 + boomlet (http://github.com/diogo149/boomlet)
++ progress
 
 Status
 -----

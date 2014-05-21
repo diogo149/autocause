@@ -359,11 +359,14 @@ def load_settings(filepath):
     CONFIG = load_source("autocause_settings", filepath)
 
 
-def featurize(pairs, config_path=None):
+def featurize(pairs, config_path=None, verbose=True):
     """
     takes in input of the form (A, A_type, B, B_type) with A_type and
     B_type in {"N", "C", "B"} for numerical, cateogrical, binary respectively
     """
+    if verbose:
+        import progress.bar
+        pairs = progress.bar.Bar("featurize").iter(pairs)
     if config_path is not None:
         load_settings(config_path)
     featurized = pmap(featurize_pair, pairs)
